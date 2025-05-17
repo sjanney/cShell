@@ -1,142 +1,116 @@
-# VirtualShell OS
+# cShell
 
-A sophisticated virtual operating system shell implementation in C that simulates various OS components and provides a rich command-line interface.
+A modern, feature-rich shell with AI capabilities built in C.
 
 ## Features
 
-### Core Shell Features
-- Command-line interface with history support
-- Command parsing and execution
-- I/O redirection (`>`, `>>`, `<`)
-- Background process support (`&`)
-- Job control (fg, bg, kill)
-- Command history navigation
+- 🎨 Beautiful colored interface
+- 🤖 AI-powered command suggestions and explanations
+- 📝 Command history
+- 🔄 Process management
+- 📂 File system operations
+- 🌍 Environment variable management
+- 🎯 Built-in commands
+- 🛡️ Signal handling
 
-### Virtual OS Components
-1. **Process Management**
-   - Process creation and termination
-   - Priority-based scheduling
-   - Process status tracking
-   - Memory usage monitoring
+## Prerequisites
 
-2. **Memory Management**
-   - Memory allocation and deallocation
-   - Memory block tracking
-   - Process memory association
-
-3. **Network Interface Simulation**
-   - Virtual network interfaces
-   - IP and MAC address management
-   - Network statistics tracking
-   - Interface status monitoring
-
-4. **Device Management**
-   - Virtual device simulation
-   - Device status tracking
-   - Driver management
-   - Last access monitoring
-
-5. **Virtual Filesystem**
-   - File and directory creation
-   - Permission management
-   - Ownership tracking
-   - Content management
-
-6. **User Management**
-   - User account management
-   - UID/GID system
-   - Home directory support
-   - Shell configuration
-
-## Building and Running
-
-### Prerequisites
 - GCC compiler
 - Make
-- Standard C library
+- libreadline
+- libcurl
+- OpenAI API key (for AI features)
 
-### Compilation
+## Installation
+
+1. Clone the repository:
 ```bash
+git clone https://github.com/yourusername/cShell.git
 cd cShell
+```
+
+2. Install dependencies:
+
+On Ubuntu/Debian:
+```bash
+sudo apt-get install build-essential libreadline-dev libcurl4-openssl-dev
+```
+
+On macOS:
+```bash
+brew install readline curl
+```
+
+3. Build the shell:
+```bash
 make
 ```
 
-### Running
+## Usage
+
+1. Start the shell:
 ```bash
-./app
+./bin/cshell
 ```
 
-### Running Tests
+2. Set up OpenAI API key (for AI features):
 ```bash
-make test
+export OPENAI_API_KEY="your-api-key-here"
 ```
 
 ## Available Commands
 
-### Basic Shell Commands
-- `cd [directory]` - Change directory
-- `pwd` - Print working directory
-- `ls [options]` - List directory contents
-- `echo [text]` - Print text
-- `history` - Show command history
-- `help` - Show help message
+### Basic Commands
+- `help` - Display help information
 - `exit` - Exit the shell
+- `clear` - Clear the screen
+- `ls` - List directory contents
+- `cd` - Change directory
+- `pwd` - Print working directory
+
+### File Operations
+- `mkdir` - Create a new directory
+- `rmdir` - Remove an empty directory
+- `touch` - Create an empty file
+- `rm` - Remove a file
+- `cat` - Display file contents
+- `echo` - Display a line of text
 
 ### Process Management
-- `process list` - List all processes
-- `process create <name> [priority]` - Create a new process
-- `process kill <pid>` - Terminate a process
+- `ps` - List processes
+- `kill` - Terminate a process
+- `bg` - Resume a stopped job in background
+- `fg` - Resume a stopped job in foreground
+- `jobs` - List background jobs
 
-### Memory Management
-- `memory list` - Show memory usage
-- `memory alloc <process> <size>` - Allocate memory
-- `memory free <block_id>` - Free memory block
+### Environment Variables
+- `env` - Display environment variables
+- `export` - Set an environment variable
+- `unset` - Remove an environment variable
 
-### Network Management
-- `network list` - Show network interfaces
-- `network stats` - Update and show network statistics
+### AI Commands
+- `ai help` - Show AI command help
+- `ai explain <command>` - Explain what a command does
+- `ai suggest <description>` - Get command suggestions
+- `ai learn <input> <feedback>` - Provide feedback to AI
 
-### Device Management
-- `device list` - List all devices
-- `device status` - Show device status
+## Building from Source
 
-### Virtual Filesystem
-- `vfs list` - List filesystem contents
-- `vfs create <name> <content>` - Create a file
-- `vfs delete <name>` - Delete a file
-
-### User Management
-- `user list` - List all users
-- `user info` - Show current user information
-
-## Project Structure
-
-```
-cShell/
-├── main.c           # Main shell implementation
-├── test_suite.c     # Test suite
-├── Makefile         # Build configuration
-└── README.md        # This file
+1. Clean build:
+```bash
+make clean
+make
 ```
 
-## Testing
+2. Debug build:
+```bash
+make debug
+```
 
-The project includes a comprehensive test suite that verifies the functionality of all major components. Run the tests using:
-
+3. Test build:
 ```bash
 make test
 ```
-
-The test suite covers:
-- Process management
-- Memory management
-- Network interfaces
-- Device management
-- Virtual filesystem
-- User management
-- Command parsing
-- History management
-- Job control
 
 ## Contributing
 
@@ -152,6 +126,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Acknowledgments
 
-- Inspired by Unix/Linux shell implementations
-- Built for educational purposes
-- Designed to demonstrate OS concepts 
+- GNU Readline for command line editing
+- OpenAI for AI capabilities
+- All contributors who have helped shape this project 

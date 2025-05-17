@@ -1,0 +1,74 @@
+# cShell Interactive Demo
+# Copy and paste these commands into cShell
+
+# 1. Basic Shell Features
+echo "1. Basic Shell Features"
+pwd
+whoami
+uname -a
+
+# 2. Environment Variables
+echo "2. Environment Variables"
+export DEMO_VAR="Hello from cShell!"
+env | grep DEMO_VAR
+unset DEMO_VAR
+
+# 3. File Operations
+echo "3. File Operations"
+mkdir -p demo_dir
+cd demo_dir
+echo "This is a test file" > test.txt
+echo "Another line" >> test.txt
+cat test.txt
+ls -la
+cd ..
+
+# 4. Process Management
+echo "4. Process Management"
+sleep 5 &
+ps
+jobs
+fg %1
+
+# 5. Directory Stack
+echo "5. Directory Stack"
+pushd demo_dir
+pwd
+pushd ..
+pwd
+dirs
+popd
+popd
+
+# 6. Text Processing
+echo "6. Text Processing"
+echo "apple
+banana
+cherry
+date" > fruits.txt
+cat fruits.txt | sort
+cat fruits.txt | wc -l
+
+# 7. AI Features
+echo "7. AI Features"
+ai-help ls
+ai-explain "What is process management?"
+ai-suggest "How to find large files?"
+
+# 8. Network Operations
+echo "8. Network Operations"
+ping -c 1 localhost
+netstat -an | grep LISTEN
+
+# 9. System Information
+echo "9. System Information"
+uname -a
+whoami
+pwd
+
+# 10. Cleanup
+echo "10. Cleanup"
+rm -rf demo_dir
+rm fruits.txt
+
+echo "Demo completed!" 

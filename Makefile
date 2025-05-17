@@ -1,19 +1,49 @@
 CC = gcc
-CFLAGS = -Wall -Wextra
-TEST_FLAGS = -Wall -Wextra -g
+CFLAGS = -Wall -Wextra -g -I./include
+LDFLAGS = -lcurl
 
-all: app
+# Directories
+SRC_DIR = src
+SHELL_DIR = $(SRC_DIR)/shell
+OBJ_DIR = obj
+BIN_DIR = bin
+INCLUDE_DIR = include
 
-app: main.c
-	$(CC) $(CFLAGS) -o app main.c
+# Source files
+SRC_FILES = $(wildcard $(SRC_DIR)/*.c)
+SHELL_FILES = $(wildcard $(SHELL_DIR)/*.c)
+SRC_FILES += $(SHELL_FILES)
 
-test: test_suite.c
-	$(CC) $(TEST_FLAGS) -o test_suite test_suite.c
-	./test_suite
+# Object files
+OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRC_FILES))
 
+# Target executable
+TARGET = $(BIN_DIR)/cshell
+
+# Default target
+all: $(TARGET)
+
+# Create directories
+$(OBJ_DIR)/shell:
+	mkdir -p $@
+
+$(BIN_DIR):
+	mkdir -p $@
+
+# Link the executable
+$(TARGET): $(OBJ_FILES) | $(BIN_DIR)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+# Compile source files
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)/shell
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Clean build files
 clean:
-	rm -f app test_suite
-	rm -f *.o
-	rm -f .shell_history
+	rm -rf $(OBJ_DIR) $(BIN_DIR)
 
-.PHONY: all test clean 
+# Run the shell
+run: $(TARGET)
+	./$(TARGET)
+
+.PHONY: all clean run 
