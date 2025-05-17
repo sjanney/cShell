@@ -1,8 +1,4 @@
-#include "../../include/shell/shell.h"
-#include "../../include/shell/commands.h"
-#include "../../include/shell/env.h"
-#include "../../include/shell/process.h"
-#include "../../include/shell/ai.h"
+#include "../include/shell/shell.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

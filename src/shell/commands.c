@@ -17,6 +17,12 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <mach/mach.h>
+#include <mach/vm_statistics.h>
+#include <mach/mach_types.h>
+#include <mach/mach_init.h>
+#include <mach/mach_host.h>
+#include <sys/sysctl.h>
 
 // Color definitions
 #define COLOR_RESET     "\033[0m"
@@ -27,6 +33,33 @@
 #define COLOR_BLUE      "\033[34m"
 #define COLOR_MAGENTA   "\033[35m"
 #define COLOR_CYAN      "\033[36m"
+
+// Function declarations
+int cmd_help(int argc, char **argv);
+int cmd_exit(int argc, char **argv);
+int cmd_clear(int argc, char **argv);
+int cmd_ls(int argc, char **argv);
+int cmd_cd(int argc, char **argv);
+int cmd_pwd(int argc, char **argv);
+int cmd_mkdir(int argc, char **argv);
+int cmd_rmdir(int argc, char **argv);
+int cmd_touch(int argc, char **argv);
+int cmd_rm(int argc, char **argv);
+int cmd_cat(int argc, char **argv);
+int cmd_echo(int argc, char **argv);
+int cmd_ps(int argc, char **argv);
+int cmd_kill(int argc, char **argv);
+int cmd_bg(int argc, char **argv);
+int cmd_fg(int argc, char **argv);
+int cmd_jobs(int argc, char **argv);
+int cmd_env(int argc, char **argv);
+int cmd_export(int argc, char **argv);
+int cmd_unset(int argc, char **argv);
+int cmd_ai_help(int argc, char **argv);
+int cmd_ai_explain(int argc, char **argv);
+int cmd_ai_suggest(int argc, char **argv);
+int cmd_ai_learn(int argc, char **argv);
+int cmd_sysmon(int argc, char **argv);
 
 // Command table
 Command builtin_commands[] = {
@@ -55,6 +88,7 @@ Command builtin_commands[] = {
     { "ai-explain", "Explain a command", cmd_ai_explain },
     { "ai-suggest", "Get command suggestions", cmd_ai_suggest },
     { "ai-learn", "Provide feedback to AI", cmd_ai_learn },
+    { "sysmon", "Display system metrics (CPU, Memory, Disk, Load)", cmd_sysmon },
     { NULL, NULL, NULL }
 };
 
@@ -500,5 +534,88 @@ int cmd_ai_learn(int argc, char **argv) {
     }
 
     ai_learn(argv[1], argv[2]);
+    return 0;
+}
+
+// System monitoring command
+int cmd_sysmon(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+    
+    // Get CPU usage using sysctl
+    int mib[2] = {CTL_HW, HW_NCPU};
+    int num_cpu;
+    size_t len = sizeof(num_cpu);
+    if (sysctl(mib, 2, &num_cpu, &len, NULL, 0) == 0) {
+        printf("CPU Cores: %d\n", num_cpu);
+    }
+
+    // Get memory usage using mach
+    mach_port_t host_port = mach_host_self();
+    mach_msg_type_number_t host_size = sizeof(vm_statistics64_data_t) / sizeof(integer_t);
+    vm_size_t page_size;
+    vm_statistics64_data_t vm_stats;
+    
+    host_page_size(host_port, &page_size);
+    
+    if (host_statistics64(host_port, HOST_VM_INFO64, (host_info64_t)&vm_stats, &host_size) == KERN_SUCCESS) {
+        unsigned long long total_mem = 0;
+        int mib[2] = {CTL_HW, HW_MEMSIZE};
+        size_t len = sizeof(total_mem);
+        if (sysctl(mib, 2, &total_mem, &len, NULL, 0) == 0) {
+            unsigned long long free_mem = vm_stats.free_count * page_size;
+            unsigned long long used_mem = total_mem - free_mem;
+            float mem_usage = (float)used_mem / total_mem * 100.0f;
+            
+            printf("\nMemory Usage: %.1f%%\n", mem_usage);
+            printf("Total Memory: %.2f GB\n", total_mem / 1024.0f / 1024.0f / 1024.0f);
+            printf("Used Memory: %.2f GB\n", used_mem / 1024.0f / 1024.0f / 1024.0f);
+            printf("Free Memory: %.2f GB\n", free_mem / 1024.0f / 1024.0f / 1024.0f);
+        }
+    }
+
+    // Get disk usage
+    FILE *df = popen("df -h /", "r");
+    if (df) {
+        char line[256];
+        // Skip header
+        fgets(line, sizeof(line), df);
+        if (fgets(line, sizeof(line), df)) {
+            char filesystem[256], size[32], used[32], avail[32], use_percent[32], mounted[256];
+            sscanf(line, "%s %s %s %s %s %s",
+                   filesystem, size, used, avail, use_percent, mounted);
+            printf("\nDisk Usage:\n");
+            printf("Filesystem: %s\n", filesystem);
+            printf("Size: %s\n", size);
+            printf("Used: %s\n", used);
+            printf("Available: %s\n", avail);
+            printf("Use%%: %s\n", use_percent);
+            printf("Mounted on: %s\n", mounted);
+        }
+        pclose(df);
+    }
+
+    // Get load average using sysctl
+    struct loadavg load;
+    int mib_load[2] = {CTL_VM, VM_LOADAVG};
+    size_t load_size = sizeof(load);
+    if (sysctl(mib_load, 2, &load, &load_size, NULL, 0) == 0) {
+        printf("\nLoad Average (1/5/15 min): %.2f %.2f %.2f\n",
+               (double)load.ldavg[0] / load.fscale,
+               (double)load.ldavg[1] / load.fscale,
+               (double)load.ldavg[2] / load.fscale);
+    }
+
+    // Get process count
+    FILE *ps = popen("ps aux | wc -l", "r");
+    if (ps) {
+        char line[32];
+        if (fgets(line, sizeof(line), ps)) {
+            int process_count = atoi(line) - 1; // Subtract header line
+            printf("Total Processes: %d\n", process_count);
+        }
+        pclose(ps);
+    }
+
     return 0;
 } 
